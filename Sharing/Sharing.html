@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Visualizing Election Results with ggplot2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dennis Tseng" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Visualizing Election Results with ggplot2
+## Taiwan 2020 Election &amp; NTU Student Congress
+### Dennis Tseng
+### Taiwan R User Group
+### 2020/01/20
+
+---
+
+&lt;style type="text/css"&gt;
+.remark-slide-content {
+    font-size: 28px;
+    padding: 1em 2em 1em 2em;
+}
+
+.my-one-page-font {
+  font-size: 10px;
+}
+&lt;/style&gt;
+
+# Self Introduction
+
+&lt;ul&gt;
+&lt;li&gt;Background
+    &lt;ul&gt;
+    &lt;li&gt;NTU Business Administration&lt;/li&gt;
+    &lt;li&gt;Yahoo Taiwan CRM Analytics Intern&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Interest
+    &lt;ul&gt;
+    &lt;li&gt;Data Analyst Track&lt;/li&gt;
+    &lt;li&gt;Data Journalist Track&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;R
+    &lt;ul&gt;
+    &lt;li&gt;package: dplyr, tidyr, purrr, ggplot2, shiny&lt;/li&gt;
+    &lt;li&gt;data importing, cleaning, manipulation, visualization; social network; data mining, text mining&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;More
+    &lt;ul&gt;
+    &lt;li&gt;&lt;a href="https://medium.com/dennis-r-data-news" target="_blank"&gt;My Medium&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://dennisrdatanews.netlify.com/"&gt;My Blog&lt;/a&gt;&lt;/li&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+---
+
+# Agenda
+
+&lt;ul&gt;
+&lt;li&gt;Map
+    &lt;ul&gt;
+    &lt;li&gt;背景地圖/Background Map&lt;/li&gt;
+    &lt;li&gt;統計地圖/Choropleth&lt;/li&gt;
+    &lt;li&gt;點示地圖/Dot Distribution Map; Bubble Map&lt;/li&gt;
+    &lt;li&gt;示意地圖/Cartogram&lt;/li&gt;
+    &lt;li&gt;六邊型網格圖/Hexmap/Tilegram&lt;/li&gt;
+    &lt;li&gt;國會席次圖/Parliament Plots&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Non-Map
+    &lt;ul&gt;
+    &lt;li&gt;散點圖/Scatterplot&lt;/li&gt;
+    &lt;li&gt;堆疊長條圖/Stacked Bar Plot&lt;/li&gt;
+    &lt;li&gt;折線子圖/Facet Line Plot&lt;/li&gt;
+    &lt;li&gt;美化圖表/Aesthetic specifications&lt;/li&gt;
+    &lt;/ul&gt;
+
+---
+# Nice Work: Map
+
+&lt;img src="image/端_map_cartogram.png" width="45%" height="45%" /&gt;&lt;img src="image/viewsoftheworld_cartogram.png" width="45%" height="45%" /&gt;
+
+.pull-left[Taiwan 2020 Presidential Choropleth by [端傳媒](https://theinitium.com/article/20200112-taiwan-election-data-ntu/)]
+
+.pull-right[US 2016 Presidential Vote Share Map by [Views of the World](http://www.viewsoftheworld.net/wp-content/uploads/2016/11/USelection2016Cartogram.png)]
+---
+# Nice Work: Map
+
+&lt;img src="image/NYT_map_bubble.png" width="45%" height="45%" /&gt;&lt;img src="image/端_map_hexbin.png" width="45%" height="45%" /&gt;
+
+.pull-left[US 2012 Presidential Vote Lead Map by [The New York Times](https://www.nytimes.com/interactive/2016/11/01/upshot/many-ways-to-map-election-results.html)]
+
+.pull-right[Taiwan 2020 Parliament Hexmap by [端傳媒](https://theinitium.com/article/20200112-taiwan-election-data-ntu-1/)]
+
+---
+# Nice Work: Map
+
+&lt;img src="image/reddit_map_hex_swing.png" width="50%" height="50%" /&gt;&lt;img src="image/關鍵_plot_parliament.png" width="50%" height="50%" /&gt;
+.pull-left[UK 2019 Parliament Swing Map by [TeHuia](https://www.reddit.com/r/MapPorn/comments/eah5j1/uk_2019_election_swing_map/)]
+
+.pull-right[Taiwan 2020 Parliament Plot by [關鍵評論網](https://www.thenewslens.com/article/129934)]
+---
+
+# Data
+
+&lt;ul&gt;
+&lt;li&gt;Taiwan 2020 Election Results
+    &lt;ul&gt;
+    &lt;li&gt;Presidential Election&lt;/li&gt;
+    &lt;li&gt;Parliament Election&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;NTU Student Congress Election &amp; Attedance
+    &lt;ul&gt;
+    &lt;li&gt;Vote&lt;/li&gt;
+    &lt;li&gt;Attendance&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+---
+
+# Map: Background Map
+
+&lt;img src="image/R_map_background.png" width="70%" height="70%" /&gt;
+---
+
+# Geographical Data in R
+
+&lt;ul&gt;
+&lt;li&gt;GeoJSON
+    &lt;ul&gt;
+    &lt;li&gt;A format based on JS Object Notation, designed for representing geographical features as well as their non-spatial attributes.&lt;/li&gt;
+    &lt;li&gt;The features include points, line strings, polygons, and multi-part collections of these types.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://cran.r-project.org/web/packages/geojsonR/vignettes/the_geojsonR_package.html" target="_blank"&gt;Processing of GeoJSON data in R&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;library(geojsonR)&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Simple Feature
+    &lt;ul&gt;
+    &lt;li&gt;sf, the table (data.frame) with feature attributes and feature geometries.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="http://r-spatial.github.io/sf/articles/sf1.html" target="_blank"&gt;Simple Features for R&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;library(sf)&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+# Geographical Data in R: GeoJSON
+
+&lt;img src="image/R_example_geojson.png" width="85%" height="85%" /&gt;
+
+---
+# Geographical Data in R: sf
+
+&lt;img src="image/R_example_sf.png" width="95%" height="95%" /&gt;
+---
+
+# Geographical Data: Taiwan - shp
+
+&lt;ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Download raw data: shp&lt;/li&gt;
+    &lt;li&gt;Simplify shapefile with mapshaper&lt;/li&gt;
+    &lt;li&gt;Import shapefile with library(sf)&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Links
+    &lt;ul&gt;
+    &lt;li&gt;&lt;a href="https://data.gov.tw/dataset/7442" target="_blank"&gt;直轄市、縣市界線(TWD97經緯度)&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://mapshaper.org/" target="_blank"&gt;mapshaper&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.facebook.com/imDataMan/posts/1849991925279765" target="_blank"&gt;
+Data Man 的資料視覺化筆記介紹 mapshaper&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+    
+---
+
+# Geographical Data: Taiwan - geojson
+
+&lt;ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Download raw data: geojson&lt;/li&gt;
+    &lt;li&gt;Import shapefile with library(geojsonio)&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Links
+    &lt;ul&gt;
+    &lt;li&gt;&lt;a href="https://github.com/codeforamerica/click_that_hood/blob/master/public/data/taiwan.geojson"&gt;taiwan.geojson&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://medium.com/@imandylin2_38094/%E5%A4%A9%E4%B8%8B%E9%9B%9C%E8%AA%8C2018%E5%8F%B0%E7%81%A3%E9%81%B8%E8%88%89%E5%9C%B0%E5%9C%96%E8%A3%BD%E4%BD%9C%E5%88%86%E4%BA%AB-%E6%8A%80%E8%A1%93%E7%9A%84%E9%83%A8%E5%88%86-de82c38da77b" target="_blank"&gt;
+Building 2018 Taiwan Election Map by 林佳賢&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Background Map
+
+---
+
+# Map: Choropleth
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;A choropleth map displays divided geographical areas or regions that are coloured in relation to a numeric variable.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.r-graph-gallery.com/choropleth-map.html"&gt;Choropleth Map by the R Graph Gallery&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Election Results Data&lt;/li&gt;
+    &lt;li&gt;Decide the variables plotted&lt;/li&gt;
+    &lt;li&gt;Join Election with Taiwan sf object&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Choropleth
+
+---
+
+# Map: Dot Distribution Map/Bubble Map
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;Choropleths aggregate individual data points into a single geographic region. In contrast, a dot distribution/density map uses a dot symbol to show the presence of a feature or a phenomenon.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.r-graph-gallery.com/bubble-map.html"&gt;Bubble map by the R Graph Gallery&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Election Results Data&lt;/li&gt;
+    &lt;li&gt;Decide the variables plotted&lt;/li&gt;
+    &lt;li&gt;Join Election with Taiwan sf object&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Choropleth
+
+---
+
+# Map: Dot Distribution Map/Bubble Map
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;Choropleths aggregate individual data points into a single geographic region. In contrast, a dot distribution/density map uses a dot symbol to show the presence of a feature or a phenomenon.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.r-graph-gallery.com/bubble-map.html"&gt;Bubble map by the R Graph Gallery&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan City Population Data&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;li&gt;Comparison: geom_sf() vs. geom_polygon()&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Dot Distribution Map/Bubble Map
+
+---
+
+# Map: Cartogram
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;A cartogram is a map in which the geometry of regions is distorted in order to convey the information of an alternate variable.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.r-graph-gallery.com/cartogram.html"&gt;Cartogram by the R Graph Gallery&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Election Results Data&lt;/li&gt;
+    &lt;li&gt;Decide the variables plotted&lt;/li&gt;
+    &lt;li&gt;Join Election with Taiwan sf object&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Cartogram
+
+---
+
+# Map: Hexmap
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://www.r-graph-gallery.com/bubble-map.html"&gt;Bubble map by the R Graph Gallery&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Election Results Data&lt;/li&gt;
+    &lt;li&gt;Decide the variables plotted&lt;/li&gt;
+    &lt;li&gt;Join Election with Taiwan sf object&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Hexmap
+
+---
+
+# Map: Parliament Plots
+
+&lt;ul&gt;
+&lt;li&gt;Definition
+    &lt;ul&gt;
+    &lt;li&gt;A visual representations of the composition of legislatures that display seats colour-coded by party.&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://github.com/RobWHickman/ggparliament"&gt;ggparliament by RobWHickman&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://erocoar.github.io/ggpol/"&gt;ggpol by Frederik Tiedemann&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Parliament Raw Data&lt;/li&gt;
+    &lt;li&gt;Create x, y, and theta columns&lt;/li&gt;
+    &lt;li&gt;Plot Parliament Composition&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time: Parliament Plots
+
+---
+
+# Map: Summary
+
+&lt;ul&gt;
+&lt;li&gt;Plots
+    &lt;ul&gt;
+    &lt;li&gt;背景地圖/Background Map&lt;/li&gt;
+    &lt;li&gt;統計地圖/Choropleth&lt;/li&gt;
+    &lt;li&gt;點示地圖/Dot Distribution Map; Bubble Map&lt;/li&gt;
+    &lt;li&gt;示意地圖/Cartogram&lt;/li&gt;
+    &lt;li&gt;六邊型網格圖/Hexmap/Tilegram&lt;/li&gt;
+    &lt;li&gt;國會席次圖/Parliament Plots&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Process
+    &lt;ul&gt;
+    &lt;li&gt;Get Taiwan 2020 Election Results Data&lt;/li&gt;
+    &lt;li&gt;Decide the variables plotted&lt;/li&gt;
+    &lt;li&gt;Join Election with Taiwan sf object&lt;/li&gt;
+    &lt;li&gt;Plot and Adjust&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# 休息一下/Intermission
+
+---
+
+# Non-Map: Visualizing NTU Student Congress Vote Rate and Attendance Rate
+
+&lt;li&gt;Plots
+    &lt;ul&gt;
+    &lt;li&gt;Stacked Bar Plots&lt;/li&gt;
+    &lt;li&gt;Scatterplot&lt;/li&gt;
+    &lt;li&gt;Facet Line Plot&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;li&gt;Data
+    &lt;ul&gt;
+    &lt;li&gt;NTU Student Congress&lt;/li&gt;
+    &lt;li&gt;Election: Vote Rate&lt;/li&gt;
+    &lt;li&gt;Congress: Attedance Rate&lt;/li&gt;
+    &lt;li&gt;Variable: Grade, College, Term&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+---
+
+# Non-Map: Three Topics
+&lt;ul&gt;
+&lt;li&gt;Election: Vote Rate
+&lt;li&gt;Congress: Attedance Rate
+&lt;li&gt;Vote Rate &amp; Attendance Rate
+&lt;/ul&gt;
+
+---
+
+class: inverse, center, middle
+
+# R time
+
+---
+
+# Further
+&lt;li&gt;Books
+    &lt;ul&gt;
+    &lt;li&gt;&lt;a href="https://bookdown.org/robinlovelace/geocompr/adv-map.html" target="_blank"&gt;My Medium&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="https://bookdown.org/tpemartin/108-1-ntpu-datavisualization/" target="_blank"&gt;My Medium&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/ul&gt;
+
+
+---
+
+class: inverse, center, middle
+
+# Thanks 
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
