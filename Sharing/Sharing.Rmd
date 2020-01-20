@@ -312,6 +312,7 @@ class: inverse, center, middle
     <ul>
     <li>A a geospatial object where all regions of the map are represented as hexagons.</li>
     <li><a href="https://www.r-graph-gallery.com/hexbin-map.html">Bubble map by the R Graph Gallery</a></li>
+    <li><a href="https://github.com/olihawkins/clhex">Hexmap Editor</a></li>
     </ul>
 
 ---
