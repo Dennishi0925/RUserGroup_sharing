@@ -310,17 +310,9 @@ class: inverse, center, middle
 <ul>
 <li>Definition
     <ul>
-    <li></li>
-    <li><a href="https://www.r-graph-gallery.com/bubble-map.html">Bubble map by the R Graph Gallery</a></li>
+    <li>A a geospatial object where all regions of the map are represented as hexagons.</li>
+    <li><a href="https://www.r-graph-gallery.com/hexbin-map.html">Bubble map by the R Graph Gallery</a></li>
     </ul>
-<li>Process
-    <ul>
-    <li>Get Taiwan 2020 Election Results Data</li>
-    <li>Decide the variables plotted</li>
-    <li>Join Election with Taiwan sf object</li>
-    <li>Plot and Adjust</li>
-    </ul>
-</ul>
 
 ---
 
@@ -367,14 +359,6 @@ class: inverse, center, middle
     <li>六邊型網格圖/Hexmap/Tilegram</li>
     <li>國會席次圖/Parliament Plots</li>
     </ul>
-<li>Process
-    <ul>
-    <li>Get Taiwan 2020 Election Results Data</li>
-    <li>Decide the variables plotted</li>
-    <li>Join Election with Taiwan sf object</li>
-    <li>Plot and Adjust</li>
-    </ul>
-</ul>
 
 ---
 
@@ -386,6 +370,7 @@ class: inverse, center, middle
 
 # Non-Map: Visualizing NTU Student Congress Vote Rate and Attendance Rate
 
+<ul>
 <li>Plots
     <ul>
     <li>Stacked Bar Plots</li>
@@ -419,10 +404,13 @@ class: inverse, center, middle
 ---
 
 # Further
+
+<ul>
 <li>Books
     <ul>
-    <li><a href="https://bookdown.org/robinlovelace/geocompr/adv-map.html" target="_blank">My Medium</a></li>
-    <li><a href="https://bookdown.org/tpemartin/108-1-ntpu-datavisualization/" target="_blank">My Medium</a></li>
+    <li><a href="https://bookdown.org/robinlovelace/geocompr/adv-map.html" target="_blank">Geocomputation with R
+</a></li>
+    <li><a href="https://bookdown.org/tpemartin/108-1-ntpu-datavisualization/" target="_blank">ntpu-datavisualization</a></li>
     </ul>
 </ul>
 
