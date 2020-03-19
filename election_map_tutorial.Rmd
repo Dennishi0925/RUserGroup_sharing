@@ -1,3 +1,15 @@
+---
+title: "Election Results Visualization with ggplot2 - Map"
+author: "Dennis Tseng"
+date: "2020/01/20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 # Package names
 packages <- c('tidyverse','sf','jsonlite','ggparliament','maps',
               'geojson','geojsonio','geojsonsf','cartogram')
@@ -13,10 +25,12 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # devtools::install_github("olihawkins/clhex")
 library(clhex)
+```
 
 ## Background Map
 
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 ### read simplified shp
 dirpath_data <- "Sharing/data/"
 sf_county_shp_small <- st_read(str_c(dirpath_data, "geo_raw/COUNTY_MOI_1081121/COUNTY_MOI_1081121.shp"))
@@ -29,7 +43,7 @@ county_json_raw <- read_json(str_c(dirpath_data, "geo_raw/tawian_county.json"))
 ### there may be encoding problem on windows, if so then use iconv()
 sf_county_geojson_simplified <- county_json_raw %>% as.json() %>% 
   geojson_sf() # %>% 
-# mutate(COUNTYNAME = iconv(COUNTYNAME, "UTF-8", "BIG-5") )
+  # mutate(COUNTYNAME = iconv(COUNTYNAME, "UTF-8", "BIG-5") )
 
 sf_county_geojson_simplified %>%
   ggplot() + geom_sf()
@@ -38,10 +52,11 @@ sf_county_geojson_simplified %>%
 sf_county_geojson_simplified %>%
   st_crop(xmin=119,xmax=123,ymin=20,ymax=26) %>%
   ggplot() + geom_sf()
-
+```
 
 ## Choropleth
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 ### read result data
 df_president_county_result <- read_csv(str_c(dirpath_data, "2020/df_president_county_result_raw.csv")) %>%
   dplyr::select(place, number, party, name, vote, per, vote_place) 
@@ -108,9 +123,11 @@ plot_kmt_president <-
 
 ### use ggsave to save plots
 # ggplot2::ggsave(filename = str_c(dirpath_data, "plot_kmt_president.svg"),plot = plot_kmt_president)
+```
 
 ## Dot Distribution Map/Bubble Map
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 ### get data
 df_city_taiwan <- world.cities %>% 
   filter(country.etc=="Taiwan") %>% as_tibble()
@@ -132,9 +149,11 @@ sf_county_president %>%
   geom_sf(size = 0.2) +
   geom_point(data=df_city_taiwan, aes(x=long, y=lat, size = pop)) +
   theme_void()
+```
 
 ## Cartogram
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 ### create sp data
 sf_county_president_carto <- sf_county_president %>%
   st_crop(xmin=119,xmax=123,ymin=20,ymax=26) %>%
@@ -151,9 +170,11 @@ president_cartogram %>%
   scale_fill_gradientn(colors = c("white","#CCCCEE","#9999DD","#4141EF")) +
   coord_sf() +
   theme_void()
+```
 
 ## Parliament Plot
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 library(ggparliament)
 ### get data
 df_parliament_summary_raw <- read_rds(str_c(dirpath_data, "2020/df_parliament_summary_raw.rds"))
@@ -196,9 +217,11 @@ df_parliament_final %>%
                       limits = unique(df_parliament_final$party_short)) 
 ### 其他可以選的類型
 #type = "horseshoe", "semicircle", "circle", "classroom", "opposing_benches"
+``` 
 
 ## Hexmap/Tilegram
 
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
 ### create hexJSON based on constituency
 library(clhex)
 df_legis_constituency <- read_rds(str_c(dirpath_data, "2020/df_legis_constituency.rds"))
@@ -221,3 +244,4 @@ sf_2020 %>%
   coord_sf(datum = NA) +
   ggthemes::theme_map() +
   theme(legend.position = "null")
+```
