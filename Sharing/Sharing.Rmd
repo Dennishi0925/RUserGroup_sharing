@@ -30,7 +30,7 @@ output:
 <li>Background
     <ul>
     <li>NTU Business Administration</li>
-    <li>Yahoo Taiwan CRM Analytics Intern</li>
+    <li>CRM Analytics Intern</li>
     </ul>
 <li>Interest
     <ul>
@@ -60,8 +60,8 @@ output:
     <li>統計地圖/Choropleth</li>
     <li>點示地圖/Dot Distribution Map; Bubble Map</li>
     <li>示意地圖/Cartogram</li>
-    <li>六邊型網格圖/Hexmap/Tilegram</li>
     <li>國會席次圖/Parliament Plots</li>
+    <li>六邊型網格圖/Hexmap/Tilegram</li>
     </ul>
 <li>Non-Map
     <ul>
@@ -129,30 +129,22 @@ knitr::include_graphics("image/R_map_background.png")
 ```
 ---
 
-# Geographical Data in R
+# Spatial Data in R
 
 <ul>
-<li>GeoJSON
-    <ul>
-    <li>A format based on JS Object Notation, designed for representing geographical features as well as their non-spatial attributes.</li>
-    <li>The features include points, line strings, polygons, and multi-part collections of these types.</li>
-    <li><a href="https://cran.r-project.org/web/packages/geojsonR/vignettes/the_geojsonR_package.html" target="_blank">Processing of GeoJSON data in R</a></li>
-    <li>library(geojsonR)</li>
-    </ul>
 <li>Simple Feature
     <ul>
     <li>sf, the table (data.frame) with feature attributes and feature geometries.</li>
     <li><a href="http://r-spatial.github.io/sf/articles/sf1.html" target="_blank">Simple Features for R</a></li>
     <li>library(sf)</li>
     </ul>
+<li>Raster
+    <ul>
+    <li>raster, a spatial format consists of multiple cells/pixels. Each cell represent an area, and has its own value. The value can mapping to spatial features such as temperature.</li>
+    <li><a href="https://www.neonscience.org/dc-raster-data-r" target="_blank">Spatial Data in R: raster</a></li>
+    <li>library(raster)</li>
+    </ul>
 </ul>
-
----
-# Geographical Data in R: GeoJSON
-
-```{r image_geojson, out.width='85%', out.height='85%',echo=FALSE}
-knitr::include_graphics("image/R_example_geojson.png")
-```
 
 ---
 # Geographical Data in R: sf
@@ -160,6 +152,28 @@ knitr::include_graphics("image/R_example_geojson.png")
 ```{r image_sf, out.width='95%', out.height='95%',echo=FALSE}
 knitr::include_graphics("image/R_example_sf.png")
 ```
+---
+# Geographical Data in R: raster
+
+```{r image_raster, out.width='95%', out.height='95%',echo=FALSE}
+knitr::include_graphics("image/R_example_raster.png")
+```
+
+---
+
+# Raw Spatial Data: GeoJSON
+
+<li>GeoJSON
+    <ul>
+    <li>A format based on JS Object Notation, designed for representing geographical features as well as their non-spatial attributes. The features include points, line strings, polygons, and multi-part collections of these types.</li>
+    <li><a href="https://cran.r-project.org/web/packages/geojsonR/vignettes/the_geojsonR_package.html" target="_blank">Processing of GeoJSON data in R</a></li>
+    <li>library(geojsonR)</li>
+    </ul>
+
+```{r image_geojson, out.width='55%', out.height='55%',echo=FALSE}
+knitr::include_graphics("image/R_example_geojson.png")
+```
+
 ---
 
 # Geographical Data: Taiwan - shp
@@ -217,9 +231,9 @@ class: inverse, center, middle
 <li>Process
     <ul>
     <li>Get Taiwan 2020 Election Results Data</li>
-    <li>Decide the variables plotted</li>
+    <li>Decide the variable plotted, such as KMT vote per</li>
     <li>Join Election with Taiwan sf object</li>
-    <li>Plot and Adjust</li>
+    <li>Draw the map colored by the variable</li>
     </ul>
 </ul>
 
@@ -241,10 +255,9 @@ class: inverse, center, middle
     </ul>
 <li>Process
     <ul>
-    <li>Get Taiwan 2020 Election Results Data</li>
-    <li>Decide the variables plotted</li>
-    <li>Join Election with Taiwan sf object</li>
-    <li>Plot and Adjust</li>
+    <li>Get Taiwan Cities Population Data</li>
+    <li>Decide the variable plotted, such as city population</li>
+    <li>Plot the base map and add city dots</li>
     </ul>
 </ul>
 
@@ -252,31 +265,7 @@ class: inverse, center, middle
 
 class: inverse, center, middle
 
-# R time: Choropleth
-
----
-
-# Map: Dot Distribution Map/Bubble Map
-
-<ul>
-<li>Definition
-    <ul>
-    <li>Choropleths aggregate individual data points into a single geographic region. In contrast, a dot distribution/density map uses a dot symbol to show the presence of a feature or a phenomenon.</li>
-    <li><a href="https://www.r-graph-gallery.com/bubble-map.html">Bubble map by the R Graph Gallery</a></li>
-    </ul>
-<li>Process
-    <ul>
-    <li>Get Taiwan City Population Data</li>
-    <li>Plot and Adjust</li>
-    <li>Comparison: geom_sf() vs. geom_polygon()</li>
-    </ul>
-</ul>
-
----
-
-class: inverse, center, middle
-
-# R time: Dot Distribution Map/Bubble Map
+# R time: Dot Distribution Map
 
 ---
 
@@ -290,10 +279,11 @@ class: inverse, center, middle
     </ul>
 <li>Process
     <ul>
-    <li>Get Taiwan 2020 Election Results Data</li>
-    <li>Decide the variables plotted</li>
-    <li>Join Election with Taiwan sf object</li>
-    <li>Plot and Adjust</li>
+    <li>Get Taiwan 2020 Election Results Data and population data</li>
+    <li>Decide the variable for distortion, such as population</li>
+    <li>Also decide the variable cared about, such as KMT vote per</li>
+    <li>Distort the sf object based on the variable</li>
+    <li>Plot the distorted map and colored by chosen variable</li>
     </ul>
 </ul>
 
@@ -302,24 +292,6 @@ class: inverse, center, middle
 class: inverse, center, middle
 
 # R time: Cartogram
-
----
-
-# Map: Hexmap
-
-<ul>
-<li>Definition
-    <ul>
-    <li>A a geospatial object where all regions of the map are represented as hexagons.</li>
-    <li><a href="https://www.r-graph-gallery.com/hexbin-map.html">Bubble map by the R Graph Gallery</a></li>
-    <li><a href="https://github.com/olihawkins/clhex">Hexmap Editor</a></li>
-    </ul>
-
----
-
-class: inverse, center, middle
-
-# R time: Hexmap
 
 ---
 
@@ -347,6 +319,32 @@ class: inverse, center, middle
 # R time: Parliament Plots
 
 ---
+# Map: Hexmap
+
+<ul>
+<li>Definition
+    <ul>
+    <li>A a geospatial object where all regions of the map are represented as hexagons.</li>
+    <li><a href="https://pitchinteractiveinc.github.io/tilegrams/">tilegramps showcase with JS</a></li>
+    <li><a href="https://github.com/olihawkins/clhex">library(clhex)</a></li>
+    <li><a href="https://olihawkins.com/project/hexjson-editor/">Hexmap Editor</a></li>
+    </ul>
+<li>Process
+    <ul>
+    <li>Create empty Taiwan Constituency hexjson with library(clhex)</li>
+    <li>Draw Taiwan Constituency with hexjson editor according to geographical posistion</li>
+    <li>Import edited hexjson into R and plot with geom_sf()</li>
+    <li>Export the .SVG for further use</li>
+    </ul>
+</ul>
+
+---
+
+class: inverse, center, middle
+
+# R time: Hexmap
+
+---
 
 # Map: Summary
 
@@ -357,8 +355,8 @@ class: inverse, center, middle
     <li>統計地圖/Choropleth</li>
     <li>點示地圖/Dot Distribution Map; Bubble Map</li>
     <li>示意地圖/Cartogram</li>
-    <li>六邊型網格圖/Hexmap/Tilegram</li>
     <li>國會席次圖/Parliament Plots</li>
+    <li>六邊型網格圖/Hexmap/Tilegram</li>
     </ul>
 
 ---
@@ -421,5 +419,3 @@ class: inverse, center, middle
 class: inverse, center, middle
 
 # Thanks 
-
----
